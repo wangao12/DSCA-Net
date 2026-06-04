@@ -1,0 +1,39 @@
+<!-- scene_x2.xml - 简化版本 -->
+<mujoco model="Skydio X2 with Rich Environment">
+  <include file="x2.xml"/>
+  <option gravity="0 0 -9.81"/> 
+  <statistic center="0 0 3.0" extent="8.0" meansize=".05"/>
+
+  <visual>
+    <headlight diffuse="0.8 0.8 0.8" ambient="0.4 0.4 0.4" specular="0.2 0.2 0.2"/>
+    <rgba haze="0.15 0.25 0.35 0.8"/>
+    <global azimuth="120" elevation="-20" ellipsoidinertia="true"/>
+    <map znear="0.01" zfar="30"/>
+  </visual>
+
+  <asset>
+    <!-- 天空盒纹理 -->
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.8" rgb2="0.1 0.2 0.4" width="512" height="3072"/>
+    
+    <!-- 地面纹理 -->
+    <texture type="2d" name="ground_texture" builtin="checker" 
+             rgb1="0.3 0.4 0.2" rgb2="0.2 0.3 0.1" 
+             width="512" height="512"/>
+    <material name="ground_material" texture="ground_texture" texuniform="true" 
+              texrepeat="8 8" reflectance="0.2"/>
+    
+    <!-- 丰富环境地形高度场 -->
+    <hfield name="rich_environment" nrow="257" ncol="257" size="12 12 4.0 0.1"/>
+  </asset>
+
+  <worldbody>
+    <!-- 光照设置 -->
+    <light pos="5 5 10" dir="-0.5 -0.5 -1" directional="true" diffuse="0.8 0.8 0.8"/>
+    <light pos="-5 -5 8" dir="0.5 0.5 -1" directional="true" diffuse="0.4 0.4 0.4"/>
+    
+    <!-- 丰富环境地形 -->
+    <geom name="rich_terrain" type="hfield" hfield="rich_environment" 
+          pos="0 0 0" material="ground_material" 
+          friction="1.2 0.005 0.0001"/>
+  </worldbody>
+</mujoco>

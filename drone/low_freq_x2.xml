@@ -1,0 +1,89 @@
+<mujoco model="Skydio X2">
+  <compiler autolimits="true" assetdir="assets"/>
+
+  <option timestep="0.03" density="1.225" viscosity="1.8e-5"/>
+
+  <default>
+    <default class="x2">
+      <geom mass="0"/>
+      <motor ctrlrange="0 13"/>
+      <mesh scale="0.01 0.01 0.01"/>
+      <default class="visual">
+        <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+      </default>
+      <default class="collision">
+        <geom group="3" type="box"/>
+        <default class="rotor">
+          <geom type="ellipsoid" size=".13 .13 .01"/>
+        </default>
+      </default>
+      <site group="5"/>
+    </default>
+  </default>
+
+  <asset>
+    <texture type="2d" file="X2_lowpoly_texture_SpinningProps_1024.png"/>
+    <material name="phong3SG" texture="X2_lowpoly_texture_SpinningProps_1024"/>
+    <material name="invisible" rgba="0 0 0 0"/>
+    
+    <!-- 终点区域材质 -->
+    <material name="finish_zone_material" rgba="0.2 0.8 0.2 0.3" specular="0.5"/>
+
+    <mesh class="x2" file="X2_lowpoly.obj"/>
+  </asset>
+
+  <worldbody>
+    <light name="spotlight" mode="targetbodycom" target="x2" pos="0 -1 2"/>
+    
+    <!-- 无人机主体 -->
+    <body name="x2" pos="0 0 0.1" childclass="x2">
+      <freejoint/>
+      <camera name="drone_eye" pos="-0.15 0 0.05" euler="90 90 0" mode="fixed" fovy="95"/>
+
+      <site name="imu" pos="0 0 .02"/>
+      <geom material="phong3SG" mesh="X2_lowpoly" class="visual" quat="0 0 1 1"/>
+
+      <geom class="collision" size=".06 .027 .02" pos=".04 0 .02"/>
+      <geom class="collision" size=".06 .027 .02" pos=".04 0 .06"/>
+      <geom class="collision" size=".05 .027 .02" pos="-.07 0 .065"/>
+      <geom class="collision" size=".023 .017 .01" pos="-.137 .008 .065" quat="1 0 0 1"/>
+
+      <geom name="rotor1" class="rotor" pos="-.14 -.18 .065" mass=".25"/>
+      <geom name="rotor2" class="rotor" pos=".14 -.18 .065" mass=".25"/>
+      <geom name="rotor3" class="rotor" pos="-.14 .18 .065" mass=".25"/>
+      <geom name="rotor4" class="rotor" pos=".14 .18 .065" mass=".25"/>
+      <geom size=".16 .04 .02" pos="0 0 0.02" type="ellipsoid" mass=".325" class="visual" material="invisible"/>
+      <site name="thrust1" pos="-.14 -.18 .065"/>
+      <site name="thrust2" pos=".14 -.18 .065"/>
+      <site name="thrust3" pos="-.14 .18 .065"/>
+      <site name="thrust4" pos=".14 .18 .065"/>
+    </body>
+    <!-- ===== 新增：固定俯瞰摄像头 ===== -->
+    <camera name="overhead" pos="0.6 0 13.5" euler="0 0 90" mode="fixed" fovy="60"/>
+    <camera name="topdown" pos="8.5 0 8" euler="0 45 90" mode="fixed" fovy="60"/>
+    <camera name="overheadp" pos="0 0 20" euler="0 0 90" mode="fixed" fovy="60"/>
+    <camera name="overheadl" pos="-2.5 0 17.5" euler="0 0 90" mode="fixed" fovy="60"/>
+    <camera name="topdownl" pos="8 0 11" euler="0 38 90" mode="fixed" fovy="60"/>
+    <camera name="topdownp" pos="11.5 0 13" euler="0 35 90" mode="fixed" fovy="60"/>
+  </worldbody>
+
+  <actuator>
+    <motor class="x2" name="thrust1" site="thrust1" gear="0 0 1 0 0 .020"/>
+    <motor class="x2" name="thrust2" site="thrust2" gear="0 0 1 0 0  -.02"/>
+    <motor class="x2" name="thrust3" site="thrust3" gear="0 0 1 0 0  -.02"/>
+    <motor class="x2" name="thrust4" site="thrust4" gear="0 0 1 0 0 .02"/>
+  </actuator>
+
+  <sensor>
+    <gyro name="body_gyro" site="imu"/>
+    <accelerometer name="body_linacc" site="imu"/>
+    <framequat name="body_quat" objtype="site" objname="imu"/>
+  </sensor>
+
+  <!-- 更新 keyframe 以匹配新的自由度数量 (7个，只有无人机) -->
+  <keyframe>
+    <key name="hover" qpos="0 0 .3 1 0 0 0" 
+       ctrl="3.2495625 3.2495625 3.2495625 3.2495625"/>
+  </keyframe>
+</mujoco>
+
